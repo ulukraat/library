@@ -1,0 +1,13 @@
+.form-signin {
+    max-width: 330px;
+    padding: 1rem;
+}
+.m-auto {
+    margin: auto !important;
+}
+.w-100 {
+    width: 100% !important;
+}
+*, ::after, ::before {
+    box-sizing: border-box;
+}
