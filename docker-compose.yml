@@ -7,7 +7,7 @@ services:
     depends_on:
       - db
     env_file:
-      - .env
+      - db.env
     networks:
       - library-net
 
@@ -16,7 +16,7 @@ services:
     container_name: library_db
     restart: always
     env_file:
-      - .env
+      - db.env
     ports:
       - "5432:5432"
     volumes:

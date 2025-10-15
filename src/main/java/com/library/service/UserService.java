@@ -1,44 +1,52 @@
 package com.library.service;
 
 import com.library.model.User;
-import com.library.repository.UserRepository;
+import com.library.repository.JdbcUserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class UserService implements UserDetailsService {
-    @Autowired
-    private UserRepository userRepository;
+    private final JdbcUserRepository jdbcUserRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public void createUser(User user) {
-        userRepository.userAdd(user);
-    }
-    public void updateUser(User user) {
-        userRepository.userUpdate(user);
+    public User updateUser(User user) {
+        jdbcUserRepository.update(user);
+        return user;
     }
     public void deleteUser(User user) {
-        userRepository.userDelete(user.getId());
+        jdbcUserRepository.delete(user.getId());
     }
-    public User getUserById(Long id) {
-       return userRepository.userFindById(id);
+    public Optional<User> getUserById(Long id) {
+       return jdbcUserRepository.findById(id);
     }
     public List<User> getUsers() {
-        return userRepository.userFindAll();
+        return jdbcUserRepository.findAll();
     }
     public boolean userExistsByLogin(String username) {
-        return userRepository.userExistsByLogin(username);
+        return jdbcUserRepository.existsByLogin(username);
     }
     public boolean userExistsById(Long id) {
-        return userRepository.userExistsById(id);
+        return jdbcUserRepository.existsById(id);
+    }
+
+    public User registerUser(User user) {
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        jdbcUserRepository.add(user);
+        return user;
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.userFindByLogin(username).orElseThrow(() -> new UsernameNotFoundException(username));
+        return jdbcUserRepository.findByLogin(username).orElseThrow(() -> new UsernameNotFoundException(username));
     }
 }

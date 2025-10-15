@@ -1,80 +1,65 @@
 package com.library.controller;
 
 import com.library.model.Book;
-import com.library.model.Role;
 import com.library.model.User;
 import com.library.service.BookService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
+@RequiredArgsConstructor
+@RequestMapping("/books")
 public class BookController {
-    @Autowired
-    private final BookService bookService;
-    BookController(BookService bookService) {
-        this.bookService = bookService;
-    }
 
-    @GetMapping("/books")
+    private final BookService bookService;
+
+    @GetMapping
     public String listBooks(Model model) {
         model.addAttribute("books", bookService.getAllBooks());
         return "books";
     }
+
     @PreAuthorize("hasRole('AUTHOR') or hasRole('ADMIN')")
-    @GetMapping("/books/create")
-    public String createBook(Model model) {
+    @GetMapping("/create")
+    public String showCreateForm(Model model) {
         model.addAttribute("book", new Book());
         return "createBook";
     }
+
     @PreAuthorize("hasRole('AUTHOR') or hasRole('ADMIN')")
-    @PostMapping("/books/create")
-    public String createBook(@ModelAttribute("book") Book book,@AuthenticationPrincipal User user) {
-        book.setAuthorId(user.getId());
-        bookService.createBook(book);
+    @PostMapping("/create")
+    public String createBook(@ModelAttribute("book") Book book,
+                             @AuthenticationPrincipal User user) {
+        bookService.createBook(book,user);
         return "redirect:/books";
     }
+
     @PreAuthorize("hasRole('AUTHOR') or hasRole('ADMIN')")
-    @GetMapping("/books/delete/{id}")
-    public String deleteBook(@PathVariable("id") Long id) {
-        bookService.deleteBook(id);
-        return "redirect:/books";
+    @GetMapping("/edit/{id}")
+    public String showEditForm(@PathVariable Long id,
+                               Model model,
+                               @AuthenticationPrincipal User user) {
+        return bookService.prepareEditForm(id,user,model);
     }
+
     @PreAuthorize("hasRole('AUTHOR') or hasRole('ADMIN')")
-    @PostMapping("/books/edit/{id}")
-    public String editBook(@PathVariable("id") Long id,
+    @PostMapping("/edit/{id}")
+    public String editBook(@PathVariable Long id,
                            @ModelAttribute("book") Book bookFromForm,
                            @AuthenticationPrincipal User user) {
-
-        Book existingBook = bookService.getBookById(id);
-
-        if (user.getRole() == Role.AUTHOR && !existingBook.getAuthorId().equals(user.getId())) {
-            return "redirect:/books";
-        }
-
-        bookFromForm.setId(existingBook.getId());
-        bookFromForm.setAuthorId(existingBook.getAuthorId());
-
-        bookService.updateBook(bookFromForm);
+        boolean updated = bookService.updateBookIfAuthorized(id, bookFromForm, user);
         return "redirect:/books";
     }
+
     @PreAuthorize("hasRole('AUTHOR') or hasRole('ADMIN')")
-    @GetMapping("/books/edit/{id}")
-    public String showEditForm(@PathVariable("id") Long id, Model model, @AuthenticationPrincipal User user) {
-        Book existingBook = bookService.getBookById(id);
-
-        if (user.getRole() == Role.AUTHOR && !existingBook.getAuthorId().equals(user.getId())) {
-            return "redirect:/books";
-        }
-
-        model.addAttribute("book", existingBook);
-        return "createBook";
+    @GetMapping("/delete/{id}")
+    public String deleteBook(@PathVariable Long id,
+                             @AuthenticationPrincipal User user) {
+        bookService.deleteBookIfAuthorized(id, user);
+        return "redirect:/books";
     }
-
 }

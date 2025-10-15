@@ -1,40 +1,42 @@
 package com.library.service;
 
 import com.library.model.Comment;
-import com.library.repository.CommentRepository;
+import com.library.repository.JdbcCommentRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class CommentService {
-    @Autowired
-    private CommentRepository commentRepository;
+    private final JdbcCommentRepository jdbcCommentRepository;
 
     public void createComment(Comment comment) {
-        commentRepository.commentAdd(comment);
+        jdbcCommentRepository.add(comment);
     }
     public void updateComment(Comment comment) {
-        commentRepository.commentUpdate(comment);
+        jdbcCommentRepository.update(comment);
     }
     public void deleteComment(Comment comment) {
-        commentRepository.commentDelete(comment.getId());
+        jdbcCommentRepository.delete(comment.getId());
     }
     public List<Comment> getComments() {
-       return commentRepository.commentFindAll();
+       return jdbcCommentRepository.findAll();
     }
-    public Comment getCommentById(Long id) {
-        return commentRepository.commentFindById(id);
+    public Optional<Comment> getCommentById(Long id) {
+        return jdbcCommentRepository.findById(id);
     }
     public List<Comment> getCommentsByBookId(Long bookId) {
-        return commentRepository.commentFindByBookId(bookId);
+        return jdbcCommentRepository.findByBookId(bookId);
     }
     public List<Comment> getCommentsUserId(Long userId) {
-        return  commentRepository.commentFindByUserId(userId);
+        return  jdbcCommentRepository.findByUserId(userId);
     }
     public boolean commentExist(Comment comment) {
-        return commentRepository.commentExistsById(comment.getId());
+        return jdbcCommentRepository.existsById(comment.getId());
     }
 
 }

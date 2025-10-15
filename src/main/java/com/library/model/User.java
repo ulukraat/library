@@ -1,12 +1,19 @@
 package com.library.model;
 
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.BindParam;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+@Getter
+@Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class User implements UserDetails {
     private Long id;
     private String firstName;
@@ -15,65 +22,14 @@ public class User implements UserDetails {
     private String password;
     private Role role;
 
-    public User(String firstName, String lastName, String login, String password, Role role) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.login = login;
-        this.password = password;
-        this.role = role;
-    }
-
-    public Role getRole() {
-        return role;
-    }
-    public void setRole(Role role) {
-        this.role = role;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getLogin() {
-        return login;
-    }
-
-    public void setLogin(String login) {
-        this.login = login;
-    }
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of((GrantedAuthority) () -> "ROLE_" + role.name());
-    }
-
-    public String getPassword() {
-        return password;
+        return List.of(role);
     }
 
     @Override
     public String getUsername() {
-        return login;
+        return getLogin();
     }
 
     @Override
@@ -95,9 +51,4 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-    public User(){}
 }
