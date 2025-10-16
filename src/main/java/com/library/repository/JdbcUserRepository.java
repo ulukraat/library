@@ -19,22 +19,6 @@ import java.util.Optional;
 public class JdbcUserRepository implements UserRepository {
     private final JdbcTemplate jdbc;
 
-    private static class UserRowMapper implements RowMapper<User> {
-        @Override
-        public User mapRow(ResultSet rs, int rowNum) throws SQLException {
-            Role role = Role.valueOf(rs.getString("role"));
-            User user = User.builder()
-                    .firstName(rs.getString("first_name"))
-                    .lastName(rs.getString("last_name"))
-                    .login(rs.getString("login"))
-                    .password(rs.getString("password"))
-                    .role(role)
-                    .build();
-            user.setId(rs.getLong("id"));
-            return user;
-        }
-    }
-
     @Override
     public User add(User user) {
         String sql = "INSERT INTO users (first_name, last_name, login, password, role) VALUES (?, ?, ?, ?, ?)";
@@ -102,5 +86,21 @@ public class JdbcUserRepository implements UserRepository {
         String sql = "SELECT COUNT(*) FROM users WHERE login = ?";
         Integer count = jdbc.queryForObject(sql, Integer.class, login);
         return count != null && count > 0;
+    }
+
+    private static class UserRowMapper implements RowMapper<User> {
+        @Override
+        public User mapRow(ResultSet rs, int rowNum) throws SQLException {
+            Role role = Role.valueOf(rs.getString("role"));
+            User user = User.builder()
+                    .firstName(rs.getString("first_name"))
+                    .lastName(rs.getString("last_name"))
+                    .login(rs.getString("login"))
+                    .password(rs.getString("password"))
+                    .role(role)
+                    .build();
+            user.setId(rs.getLong("id"));
+            return user;
+        }
     }
 }

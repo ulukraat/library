@@ -16,21 +16,6 @@ import java.util.Optional;
 public class JdbcBookRepository implements BookRepository {
     private final JdbcTemplate jdbcTemplate;
 
-    private static class BookRowMapper implements RowMapper<Book> {
-        @Override
-        public Book mapRow(ResultSet rs, int rowNum) throws SQLException {
-            Book book = Book.builder()
-                    .id(rs.getLong("id"))
-                    .authorId(rs.getLong("author_id"))
-                    .title(rs.getString("title"))
-                    .description(rs.getString("description"))
-                    .image(rs.getString("image"))
-                    .build();
-            book.setId(rs.getLong("id"));
-            return book;
-        }
-    }
-
     public List<Book> findAll() {
         String sql = "SELECT * FROM books";
         return jdbcTemplate.query(sql, new BookRowMapper());
@@ -72,5 +57,19 @@ public class JdbcBookRepository implements BookRepository {
         String sql = "SELECT COUNT(*) FROM books WHERE id = ?";
         Integer count = jdbcTemplate.queryForObject(sql, Integer.class, id);
         return count != null && count > 0;
+    }
+    private static class BookRowMapper implements RowMapper<Book> {
+        @Override
+        public Book mapRow(ResultSet rs, int rowNum) throws SQLException {
+            Book book = Book.builder()
+                    .id(rs.getLong("id"))
+                    .authorId(rs.getLong("author_id"))
+                    .title(rs.getString("title"))
+                    .description(rs.getString("description"))
+                    .image(rs.getString("image"))
+                    .build();
+            book.setId(rs.getLong("id"));
+            return book;
+        }
     }
 }

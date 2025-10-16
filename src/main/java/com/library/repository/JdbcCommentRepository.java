@@ -17,21 +17,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class JdbcCommentRepository implements CommentRepository {
     private final JdbcTemplate jdbc;
-
-    private static class CommentRowMapper implements RowMapper<Comment> {
-        @Override
-        public Comment mapRow(ResultSet rs, int rowNum) throws SQLException {
-            Comment comment = new Comment(
-                    rs.getLong("user_id"),
-                    rs.getLong("book_id"),
-                    rs.getString("text"),
-                    rs.getTimestamp("created_at").toLocalDateTime()
-            );
-            comment.setId(rs.getLong("id"));
-            return comment;
-        }
-    }
-
     @Override
     public Comment add(Comment comment) {
         String sql = "INSERT INTO comments (user_id, book_id, text, created_at) VALUES (?, ?, ?, ?)";
@@ -91,5 +76,18 @@ public class JdbcCommentRepository implements CommentRepository {
         String sql = "SELECT COUNT(*) FROM comments WHERE id = ?";
         Integer count = jdbc.queryForObject(sql, Integer.class, id);
         return count != null && count > 0;
+    }
+
+    private static class CommentRowMapper implements RowMapper<Comment> {
+        @Override
+        public Comment mapRow(ResultSet rs, int rowNum) throws SQLException {
+            return Comment.builder()
+                    .id(rs.getLong("id"))
+                    .userId(rs.getLong("user_id"))
+                    .bookId(rs.getLong("book_id"))
+                    .text(rs.getString("text"))
+                    .createdAt(rs.getTimestamp("created_at").toLocalDateTime())
+                    .build();
+        }
     }
 }
