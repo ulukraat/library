@@ -2,9 +2,9 @@ package com.library.repository;
 
 import com.library.model.Comment;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
@@ -17,9 +17,16 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class JdbcCommentRepository implements CommentRepository {
     private final JdbcTemplate jdbc;
+
+    private static final String SELECT_FIELDS =
+            "id, user_id, book_id, text, created_at";
+
     @Override
     public Comment add(Comment comment) {
-        String sql = "INSERT INTO comments (user_id, book_id, text, created_at) VALUES (?, ?, ?, ?)";
+        String sql = """
+                INSERT INTO comments (user_id, book_id, text, created_at)
+                VALUES (?, ?, ?, ?)
+                """;
         jdbc.update(sql,
                 comment.getUserId(),
                 comment.getBookId(),
@@ -31,13 +38,13 @@ public class JdbcCommentRepository implements CommentRepository {
 
     @Override
     public List<Comment> findAll() {
-        String sql = "SELECT * FROM comments";
+        String sql = "SELECT " + SELECT_FIELDS + " FROM comments";
         return jdbc.query(sql, new CommentRowMapper());
     }
 
     @Override
     public Optional<Comment> findById(Long id) {
-        String sql = "SELECT * FROM comments WHERE id = ?";
+        String sql = "SELECT " + SELECT_FIELDS + " FROM comments WHERE id = ?";
         try {
             Comment comment = jdbc.queryForObject(sql, new CommentRowMapper(), id);
             return Optional.ofNullable(comment);
@@ -48,20 +55,27 @@ public class JdbcCommentRepository implements CommentRepository {
 
     @Override
     public List<Comment> findByBookId(Long bookId) {
-        String sql = "SELECT * FROM comments WHERE book_id = ?";
+        String sql = "SELECT " + SELECT_FIELDS + " FROM comments WHERE book_id = ?";
         return jdbc.query(sql, new CommentRowMapper(), bookId);
     }
 
     @Override
     public List<Comment> findByUserId(Long userId) {
-        String sql = "SELECT * FROM comments WHERE user_id = ?";
+        String sql = "SELECT " + SELECT_FIELDS + " FROM comments WHERE user_id = ?";
         return jdbc.query(sql, new CommentRowMapper(), userId);
     }
 
     @Override
     public Comment update(Comment comment) {
-        String sql = "UPDATE comments SET text = ?, created_at = ? WHERE id = ?";
-        jdbc.update(sql, comment.getText(), comment.getCreatedAt(), comment.getId());
+        String sql = """
+                UPDATE comments
+                SET text = ?, created_at = ?
+                WHERE id = ?
+                """;
+        jdbc.update(sql,
+                comment.getText(),
+                comment.getCreatedAt(),
+                comment.getId());
         return comment;
     }
 

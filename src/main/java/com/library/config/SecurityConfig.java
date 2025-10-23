@@ -1,4 +1,4 @@
-package com.library.security;
+package com.library.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,15 +21,19 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login","register","/css/**").permitAll()
+                        .requestMatchers("/login", "/register", "/css/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
-                    .loginPage("/login")
-                        .defaultSuccessUrl("/books", true)
+                        .loginPage("/login")                // твой кастомный контроллер
+                        .defaultSuccessUrl("/books", true)  // куда редиректить после логина
                         .permitAll()
-                ).logout(logout -> logout.logoutSuccessUrl("/login?logout")
-                        .permitAll());
+                )
+                .logout(logout -> logout
+                        .logoutSuccessUrl("/login?logout")
+                        .permitAll()
+                );
+
         return http.build();
     }
 }
