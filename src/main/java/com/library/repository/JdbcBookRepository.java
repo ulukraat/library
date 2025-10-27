@@ -79,7 +79,6 @@ public class JdbcBookRepository implements BookRepository {
                 book.getImage(),
                 book.getId());
 
-        // Можно добавить проверку, что запись действительно обновилась
         if (rowsAffected == 0) {
             throw new RuntimeException("Book with id " + book.getId() + " not found");
         }
@@ -91,7 +90,6 @@ public class JdbcBookRepository implements BookRepository {
         String sql = "DELETE FROM books WHERE id = ?";
         int rowsAffected = jdbcTemplate.update(sql, id);
 
-        // Опционально: можно бросить исключение если запись не найдена
         if (rowsAffected == 0) {
             throw new RuntimeException("Book with id " + id + " not found");
         }
