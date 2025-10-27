@@ -1,0 +1,27 @@
+CREATE TABLE users (
+    id BIGSERIAL PRIMARY KEY,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    login VARCHAR(100) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    role VARCHAR(20) NOT NULL DEFAULT 'USER'
+);
+
+CREATE TABLE books (
+    id BIGSERIAL PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    image VARCHAR(255),
+    author_id BIGINT NOT NULL,
+    CONSTRAINT fk_books_author FOREIGN KEY (author_id) REFERENCES users(id)
+);
+
+CREATE TABLE comments (
+    id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    book_id BIGINT NOT NULL,
+    text TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_comment_user FOREIGN KEY (user_id) REFERENCES users(id),
+    CONSTRAINT fk_comment_book FOREIGN KEY (book_id) REFERENCES books(id)
+);
