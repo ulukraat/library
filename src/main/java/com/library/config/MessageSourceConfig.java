@@ -12,29 +12,34 @@ import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 import java.util.Locale;
 
 @Configuration
-public class MessageSourceConfiguration implements WebMvcConfigurer {
+public class MessageSourceConfig implements WebMvcConfigurer {
+    public static final String BASE_NAME = "i18n/messages";
+    public static final String ENCODING = "UTF-8";
+    public static final String LANG_PARAM = "lang";
+    public static final Locale DEFAULT_LOCALE = Locale.ENGLISH;
+    public static final int CACHE_SECONDS = 3600;
 
     @Bean
     public ResourceBundleMessageSource messageSource() {
         ResourceBundleMessageSource source = new ResourceBundleMessageSource();
-        source.setBasenames("i18n/messages");
-        source.setDefaultEncoding("UTF-8");
+        source.setBasenames(BASE_NAME);
+        source.setDefaultEncoding(ENCODING);
         source.setUseCodeAsDefaultMessage(true);
-        source.setCacheSeconds(3600);
+        source.setCacheSeconds(CACHE_SECONDS);
         return source;
     }
 
     @Bean
     public LocaleResolver localeResolver() {
         SessionLocaleResolver resolver = new SessionLocaleResolver();
-        resolver.setDefaultLocale(Locale.ENGLISH);
+        resolver.setDefaultLocale(DEFAULT_LOCALE);
         return resolver;
     }
 
     @Bean
     public LocaleChangeInterceptor localeChangeInterceptor() {
         LocaleChangeInterceptor interceptor = new LocaleChangeInterceptor();
-        interceptor.setParamName("lang");
+        interceptor.setParamName(LANG_PARAM);
         return interceptor;
     }
 

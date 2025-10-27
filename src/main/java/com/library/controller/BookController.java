@@ -56,7 +56,7 @@ public class BookController {
     }
 
     @PreAuthorize("hasRole('AUTHOR') or hasRole('ADMIN')")
-    @GetMapping("/delete/{id}")
+    @DeleteMapping("/{id}")
     public String deleteBook(@PathVariable Long id,
                              @AuthenticationPrincipal User user) {
         bookService.deleteBookIfAuthorized(id, user);

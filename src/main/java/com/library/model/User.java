@@ -1,12 +1,14 @@
 package com.library.model;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.BindParam;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 @Getter
